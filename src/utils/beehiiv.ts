@@ -31,8 +31,10 @@ export const verifyBeehiivSubscriber = async (email: string): Promise<boolean|nu
       return null;
     }
 
+    console.log('response.data.data', response.data.data);
+
     return {
-      subscriber: response.data.data,
+      subscriber: response.data.data.subscriber,
       success: true,
     }
 
