@@ -13,6 +13,24 @@ const router = express.Router();
 // SuperTokens middleware for all auth routes
 router.use(middleware());
 
+const whitelistDomainsStr = process.env.WHITELIST_DOMAINS || 'lowcodecto.com,*.lowcodecto.com,localhost:4000';
+const allowedDomains = whitelistDomainsStr.split(',').map(domain => domain.trim());
+
+function isAllowedDomain(hostname, allowedDomains) {
+  return allowedDomains.some(domain => {
+    // Exact match
+    if (hostname === domain) return true;
+    
+    // Wildcard match
+    if (domain.startsWith('*.')) {
+      const suffix = domain.substring(1); // Remove the *
+      return hostname.endsWith(suffix);
+    }
+    
+    return false;
+  });
+}
+
 // Route for initiating the magic link flow
 router.post('/login', (async (req, res, next) => {
   try {
@@ -21,6 +39,16 @@ router.post('/login', (async (req, res, next) => {
 
     if (!redirectUrl) {
       redirectUrl = `${process.env.API_DOMAIN}/verify-token`
+    } else {
+      // Safe list of domains allows for custom redirect URLs
+      // Allow for wildcard subdomains
+      const url = new URL(redirectUrl);
+      if (!isAllowedDomain(url.hostname, allowedDomains)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Invalid redirect URL. The domain is not in the whitelist.'
+        });
+      }
     }
 
     if (!email) {
