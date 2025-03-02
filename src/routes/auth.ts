@@ -4,6 +4,7 @@ import { verifyToken, refreshToken } from '../controllers/auth';
 import { requireAuth, refreshTokenMiddleware } from '../middleware/auth';
 import Passwordless from 'supertokens-node/recipe/passwordless';
 import { generateJwt } from '../utils/jwt';
+import { verifyBeehiivSubscriber } from '../utils/beehiiv';
 import config from '../config';
 import { sendMagicLinkEmail } from '../services/emailService';
 
@@ -29,6 +30,14 @@ router.post('/login', (async (req, res, next) => {
       });
     }
 
+    // Verify the user is still a subscriber
+    const isSubscriber = await verifyBeehiivSubscriber(email);
+
+    if (!isSubscriber) {
+      // Revoke the session if the user is no longer a subscriber
+      return res.status(400).json({ success: false, message: 'You are not subscribed.' });
+    }
+
     // Create the magic link using SuperTokens
     const response = await Passwordless.createCode({
       tenantId: "public",
@@ -36,9 +45,7 @@ router.post('/login', (async (req, res, next) => {
       userInputCode: undefined
     });
 
-    // Construct the magic link URL
-    const websiteDomain = config.supertokens.websiteDomain;
-    const websiteBasePath = '/auth'; // This should match your SuperTokens config
+    // Construct the magic link URL// This should match your SuperTokens config
     const { preAuthSessionId, linkCode } = response;
 
     // Construct the full URL that the user will click on
