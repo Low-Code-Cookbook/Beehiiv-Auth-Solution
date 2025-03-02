@@ -47,6 +47,7 @@ router.post('/login', (async (req, res, next) => {
       if (!isAllowedDomain(url.hostname, allowedDomains)) {
         return res.status(400).json({ 
           success: false, 
+          actionCode: 'invalidRedirectUrl',
           message: 'Invalid redirect URL. The domain is not in the whitelist.'
         });
       }
@@ -55,6 +56,7 @@ router.post('/login', (async (req, res, next) => {
     if (!email) {
       return res.status(400).json({
         success: false,
+        actionCode: 'emailRequired',
         message: 'Email is required'
       });
     }
@@ -86,6 +88,7 @@ router.post('/login', (async (req, res, next) => {
     return res.json({
       success: true,
       magicLink: magicLink,
+      actionCode: 'magicLinkSent',
       message: "Magic link sent successfully"
     });
   } catch (error: any) {
@@ -93,7 +96,8 @@ router.post('/login', (async (req, res, next) => {
     if (error.message && error.message.includes('not a Beehiiv subscriber')) {
       return res.status(403).json({
         success: false,
-        message: 'Email is not registered as a Beehiiv subscriber'
+        actionCode: 'emailNotSubscribed',
+        message: 'Email is not registered as a Low Code CTO subscriber.'
       });
     }
 
@@ -109,6 +113,7 @@ router.get('/callback', (async (req, res, next) => {
     if (!preAuthSessionId || !linkCode) {
       return res.status(400).json({
         success: false,
+        actionCode: 'emailNotSubscribed',
         message: 'Missing required parameters'
       });
     }
@@ -151,6 +156,7 @@ router.get('/callback', (async (req, res, next) => {
     } else {
       return res.status(400).json({
         success: false,
+        actionCode: 'invalidOrExpiredCode',
         message: 'Invalid or expired code'
       });
     }
