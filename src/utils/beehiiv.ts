@@ -33,11 +33,17 @@ export const verifyBeehiivSubscriber = async (email: string): Promise<boolean|nu
 
     console.log('response.data.data', response.data.data);
 
-    return {
-      subscriber: response.data.data.subscriber,
-      success: true,
-    }
+    const subscriberData = {
+      status: response.data.data.status,
+      email: response.data.data.email || email,
+      subscription_tier: response.data.data.subscription_tier,
+      id: response.data.data.id,
+      created: response.data.data.created,
+    };
 
+    console.log('subscriberData', subscriberData);
+
+    return subscriberData;
   } catch (error: any) {
     console.error('Error verifying Beehiiv subscriber:', error.message);
     // In case of API failure, we should fail closed (deny access)

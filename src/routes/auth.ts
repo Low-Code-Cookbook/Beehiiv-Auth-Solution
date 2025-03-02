@@ -62,6 +62,7 @@ router.post('/login', (async (req, res, next) => {
     }
 
     // Verify the user is still a subscriber
+    console.log('Prompt Email', email);
     const subscriber = await verifyBeehiivSubscriber(email);
 
     if (!subscriber) {
@@ -71,7 +72,7 @@ router.post('/login', (async (req, res, next) => {
         message: 'You are not subscribed to the Low Code CTO newsletter.' 
       });
     } else {
-      console.log('Heree subscriber', subscriber);
+      console.log('Heree subscriber:', subscriber);
       if (subscriber.status !== 'active') {
         return res.status(400).json({ 
           success: false, 
