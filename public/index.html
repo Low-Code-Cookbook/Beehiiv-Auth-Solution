@@ -5,50 +5,527 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Magic Link Authentication - Beehiiv Auth</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Additional styles for multi-column layout */
+    .columns-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      width: 100%;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    
+    .column {
+      flex: 1;
+      min-width: 300px;
+      max-width: 450px; /* Add max-width for single column */
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Special styling when there's only one visible column */
+    #column1:only-of-type {
+      margin: 0 auto;
+      flex: 0 1 400px; /* Don't grow, can shrink, base width */
+    }
+    
+    .column-header {
+      padding: 15px;
+      background-color: #4f46e5;
+      color: white;
+    }
+    
+    .column-header h2 {
+      font-size: 20px;
+      margin-bottom: 5px;
+    }
+    
+    .column-body {
+      padding: 20px;
+      flex-grow: 1;
+      overflow-y: auto;
+      max-height: calc(100vh - 200px);
+    }
+    
+    .column-footer {
+      padding: 10px 20px;
+      background-color: #f8f9fa;
+      border-top: 1px solid #eee;
+      font-size: 14px;
+      color: #666;
+    }
+    
+    /* Ensure the page has enough height */
+    body {
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 100%;
+      padding: 0;
+    }
+    
+    /* Status indicator for columns */
+    .step-indicator {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: #a5b4fc;
+      color: white;
+      text-align: center;
+      line-height: 24px;
+      margin-right: 8px;
+      font-weight: bold;
+    }
+    
+    .step-active {
+      background-color: #4f46e5;
+    }
+    
+    .step-completed {
+      background-color: #10b981;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <div class="card">
-      <div class="card-header">
-        <h1>Magic Link Authentication</h1>
-        <p>Enter your email address to receive a magic link</p>
-      </div>
-      
-      <div class="card-body">
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input type="email" id="email" placeholder="your.email@example.com" required>
+    <h1 style="text-align: center; margin-bottom: 20px;">Beehiiv App Authentication</h1>
+    
+    <div class="columns-container">
+      <!-- Column 1: Send Magic Link -->
+      <div class="column" id="column1">
+        <div class="column-header">
+          <h2><span class="step-indicator step-active">1</span> Send Magic Link</h2>
+          <p>Enter your email to receive a magic link</p>
         </div>
         
-        <button id="loginButton" class="btn-primary">Send Magic Link</button>
-        <button id="testApiButton" class="btn-primary" style="margin-top: 10px; background-color: #10b981;">Test API Connection</button>
+        <div class="column-body">
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="your.email@example.com" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="redirectUrl">Redirect URL</label>
+            <input type="text" id="redirectUrl" placeholder="https://example.com/callback" value="">
+            <small style="display: block; margin-top: 5px; color: #666;">Leave empty to use the default redirect URL</small>
+          </div>
+          
+          <button id="loginButton" class="btn-primary">Send Magic Link</button>
+          
+          <div id="message1" class="message hidden"></div>
+          <div id="loader1" class="loader hidden"></div>
+        </div>
         
-        <div id="message" class="message hidden"></div>
-        <div id="loader" class="loader hidden"></div>
+        <div class="column-footer">
+          <p>Step 1: Request a magic link to your email</p>
+        </div>
       </div>
       
-      <div class="card-footer">
-        <p>This is a test authentication system using Magic Links.</p>
-        <p class="api-url">API URL: <span id="apiUrl"></span></p>
+      <!-- Column 2: Process Magic Link (initially hidden) -->
+      <div class="column" id="column2" style="display: none;">
+        <div class="column-header">
+          <h2><span class="step-indicator" id="step2Indicator">2</span> Process Magic Link</h2>
+          <p>Process your magic link to get a JWT token</p>
+        </div>
+        
+        <div class="column-body">
+          <div class="form-group">
+            <label>Magic Link URL:</label>
+            <div id="magicLinkDisplay" class="response-box" style="word-break: break-all; font-size: 14px; overflow-wrap: break-word;"></div>
+          </div>
+          
+          <button id="processLinkBtn" class="btn-primary" style="background-color: #059669;">Process Magic Link</button>
+          
+          <div id="message2" class="message hidden"></div>
+          <div id="loader2" class="loader hidden"></div>
+        </div>
+        
+        <div class="column-footer">
+          <p>Step 2: Process the magic link to authenticate</p>
+        </div>
       </div>
+      
+      <!-- Column 3: Verify Token (initially hidden) -->
+      <div class="column" id="column3" style="display: none;">
+        <div class="column-header">
+          <h2><span class="step-indicator" id="step3Indicator">3</span> Verify Token</h2>
+          <p>Verify your JWT token with the API</p>
+        </div>
+        
+        <div class="column-body">
+          <div class="form-group">
+            <label for="tokenDisplay">JWT Token:</label>
+            <textarea id="tokenDisplay" readonly style="min-height: 250px; font-family: monospace;" placeholder="Your JWT token will appear here..."></textarea>
+          </div>
+          
+          <div class="form-group" style="display: flex; gap: 10px;">
+            <button id="verifyTokenBtn" class="btn-primary" style="flex: 1; background-color: #059669;">Verify Token</button>
+            <button id="copyTokenBtn" class="btn-primary" style="flex: 1; background-color: #6366f1;">Copy Token</button>
+          </div>
+          
+          <div id="message3" class="message hidden"></div>
+          <div id="loader3" class="loader hidden"></div>
+        </div>
+        
+        <div class="column-footer">
+          <p>Step 3: Verify token validity</p>
+        </div>
+      </div>
+      
+      <!-- NEW Column 4: Verification Results (initially hidden) -->
+      <div class="column" id="column4" style="display: none;">
+        <div class="column-header">
+          <h2><span class="step-indicator" id="step4Indicator">4</span> Verification Results</h2>
+          <p>View detailed verification results</p>
+        </div>
+        
+        <div class="column-body">
+          <div class="verification-results">
+            <div class="form-group">
+              <label>Token Status:</label>
+              <div id="tokenStatus" class="status-box">Not verified yet</div>
+            </div>
+            
+            <div class="form-group">
+              <label>Decoded Payload:</label>
+              <pre id="decodedPayload" class="response-box">No data yet</pre>
+            </div>
+            
+            <div class="form-group">
+              <label>API Response:</label>
+              <pre id="apiResponse" class="response-box">No response yet</pre>
+            </div>
+          </div>
+        </div>
+        
+        <div class="column-footer">
+          <p>Step 4: Review token information and API response</p>
+        </div>
+      </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 20px;">
+      <p>API URL: <span id="apiUrl"></span></p>
     </div>
   </div>
   
-  <script src="app.js"></script>
   <script>
-    document.getElementById('testApiButton').addEventListener('click', async function() {
+    // Helper function to show messages
+    const showMessage = (text, type = "success", columnNum = 1) => {
+      const messageDiv = document.getElementById(`message${columnNum}`);
+      messageDiv.textContent = text;
+      messageDiv.classList.remove('hidden', 'success', 'error');
+      messageDiv.classList.add(type);
+    };
+    
+    // Function to show/hide loaders
+    const toggleLoader = (columnNum, show) => {
+      const loader = document.getElementById(`loader${columnNum}`);
+      if (show) {
+        loader.classList.remove('hidden');
+      } else {
+        loader.classList.add('hidden');
+      }
+    };
+    
+    // Function to parse JWT token
+    const parseJwt = (token) => {
       try {
-        showMessage("Testing API connection...", "");
-        const response = await fetch('/health');
-        if (response.ok) {
-          const data = await response.json();
-          showMessage(`API Connected! Status: ${data.status || 'OK'}`, "success");
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+      } catch (e) {
+        console.error('Error parsing JWT:', e);
+        return null;
+      }
+    };
+    
+    // Function to extract query parameters from a URL
+    const extractParams = (url) => {
+      try {
+        const urlObj = new URL(url);
+        return {
+          preAuthSessionId: urlObj.searchParams.get('preAuthSessionId'),
+          linkCode: urlObj.searchParams.get('linkCode')
+        };
+      } catch (error) {
+        console.error('Error parsing URL:', error);
+        return { preAuthSessionId: null, linkCode: null };
+      }
+    };
+    
+    // Function to update step indicators
+    const updateStepIndicators = (completedStep) => {
+      // Reset all to default
+      document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
+        indicator.classList.remove('step-active', 'step-completed');
+        if (index + 1 <= completedStep) {
+          indicator.classList.add('step-completed');
+        } else if (index + 1 === completedStep + 1) {
+          indicator.classList.add('step-active');
+        }
+      });
+    };
+    
+    // Function to process the magic link
+    const processMagicLink = async () => {
+      const magicLink = document.getElementById('magicLinkDisplay').textContent;
+      
+      if (!magicLink) {
+        showMessage("No magic link to process", "error", 2);
+        return;
+      }
+      
+      // Show loading state
+      toggleLoader(2, true);
+      document.getElementById('processLinkBtn').disabled = true;
+      
+      try {
+        // Extract parameters from the magic link
+        const { preAuthSessionId, linkCode } = extractParams(magicLink);
+        
+        if (!preAuthSessionId || !linkCode) {
+          showMessage("Invalid magic link format", "error", 2);
+          return;
+        }
+        
+        // Call the callback endpoint with the extracted parameters
+        const response = await fetch(`/auth/callback?preAuthSessionId=${preAuthSessionId}&linkCode=${linkCode}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          // Display the token
+          const tokenDisplay = document.getElementById('tokenDisplay');
+          tokenDisplay.value = data.token;
+          
+          // Store in localStorage
+          localStorage.setItem('authToken', data.token);
+          
+          // Show the token column
+          document.getElementById('column3').style.display = 'flex';
+          
+          // Show the decoded payload
+          const decodedPayload = parseJwt(data.token);
+          if (decodedPayload) {
+            document.getElementById('decodedPayload').textContent = JSON.stringify(decodedPayload, null, 2);
+          }
+          
+          // Update step indicators
+          updateStepIndicators(2);
+          
+          showMessage("Successfully processed magic link", "success", 2);
         } else {
-          showMessage(`API Error: ${response.status} ${response.statusText}`, "error");
+          showMessage(data.message || "Failed to process magic link", "error", 2);
         }
       } catch (error) {
-        showMessage(`API Connection Failed: ${error.message}`, "error");
+        showMessage(`Error: ${error.message}`, "error", 2);
+        console.error("Error processing magic link:", error);
+      } finally {
+        toggleLoader(2, false);
+        document.getElementById('processLinkBtn').disabled = false;
       }
+    };
+    
+    // Function to verify the token
+    const verifyToken = async () => {
+      const token = document.getElementById('tokenDisplay').value.trim();
+      const statusElement = document.getElementById('tokenStatus');
+      const responseElement = document.getElementById('apiResponse');
+      
+      if (!token) {
+        showMessage("No token to verify", "error", 3);
+        return;
+      }
+      
+      // Show loading state
+      toggleLoader(3, true);
+      document.getElementById('verifyTokenBtn').disabled = true;
+      
+      try {
+        // Verify with API
+        const response = await fetch('/auth/verify', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        const responseData = await response.json();
+        responseElement.textContent = JSON.stringify(responseData, null, 2);
+        
+        // Show the results column
+        document.getElementById('column4').style.display = 'flex';
+        
+        // Update token status
+        if (response.ok && responseData.valid) {
+          statusElement.textContent = "VALID ✓";
+          statusElement.className = 'status-box success';
+          showMessage("Token is valid!", "success", 3);
+          
+          // Update step indicators
+          updateStepIndicators(3);
+        } else {
+          statusElement.textContent = "INVALID ✗";
+          statusElement.className = 'status-box error';
+          showMessage(responseData.message || "Token is invalid", "error", 3);
+        }
+      } catch (error) {
+        statusElement.textContent = "ERROR";
+        statusElement.className = 'status-box error';
+        responseElement.textContent = `Error: ${error.message}`;
+        showMessage(`Verification error: ${error.message}`, "error", 3);
+      } finally {
+        toggleLoader(3, false);
+        document.getElementById('verifyTokenBtn').disabled = false;
+      }
+    };
+    
+    // Function to copy token to clipboard
+    const copyToken = () => {
+      const tokenElement = document.getElementById('tokenDisplay');
+      tokenElement.select();
+      document.execCommand('copy');
+      showMessage("Token copied to clipboard!", "success", 3);
+    };
+
+    // Function to handle sending magic link
+    const sendMagicLink = async () => {
+      const email = document.getElementById('email').value.trim();
+      const redirectUrl = document.getElementById('redirectUrl').value.trim();
+      
+      // Basic validation
+      if (!email || !email.includes('@')) {
+        showMessage("Please enter a valid email address", "error", 1);
+        return;
+      }
+      
+      // Reset columns 3 and 4 since we're starting a new request
+      document.getElementById('column3').style.display = 'none';
+      document.getElementById('column4').style.display = 'none';
+      document.getElementById('column2').style.display = 'none';
+      
+      // Reset any existing data in the token and results columns
+      document.getElementById('tokenDisplay').value = '';
+      document.getElementById('tokenStatus').textContent = 'Not verified yet';
+      document.getElementById('tokenStatus').className = 'status-box';
+      document.getElementById('decodedPayload').textContent = 'No data yet';
+      document.getElementById('apiResponse').textContent = 'No response yet';
+      
+      // Reset the step indicators to show only step 1 as active
+      updateStepIndicators(0);
+      
+      // Show loading state
+      toggleLoader(1, true);
+      document.getElementById('loginButton').disabled = true;
+      
+      try {
+        // Send magic link using direct API call
+        const apiUrl = '/auth/login';
+        console.log(`Sending request to: ${apiUrl}`);
+        
+        // Prepare request body - include redirectUrl only if provided
+        const requestBody = {
+          email
+        };
+        
+        if (redirectUrl) {
+          requestBody.redirectUrl = redirectUrl;
+        }
+        
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestBody)
+        });
+        
+        console.log(`Response status: ${response.status} ${response.statusText}`);
+        
+        // Check response type
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          // Not JSON - log the actual response text for debugging
+          const htmlResponse = await response.text();
+          console.error("Received non-JSON response:", htmlResponse.substring(0, 150) + "...");
+          throw new Error(`API returned non-JSON response (${contentType}). Server might be unavailable.`);
+        }
+        
+        const data = await response.json();
+        console.log("Response data:", data);
+        
+        if (response.ok && data.success) {
+          // Save email to localStorage on successful request
+          localStorage.setItem('userEmail', email);
+          
+          showMessage(`Magic link sent to ${email}! Please check your inbox.`, "success", 1);
+          
+          // Display the magic link if it's in the response
+          if (data.magicLink) {
+            document.getElementById('magicLinkDisplay').textContent = data.magicLink;
+            document.getElementById('column2').style.display = 'flex';
+            
+            // Update step indicators
+            updateStepIndicators(1);
+          }
+        } else {
+          showMessage(data.message || "Failed to send magic link. Please try again.", "error", 1);
+        }
+      } catch (error) {
+        showMessage(`Error: ${error.message || "Failed to send magic link"}`, "error", 1);
+        console.error("Error sending magic link:", error);
+      } finally {
+        // Always re-enable the button so we can try again
+        toggleLoader(1, false);
+        document.getElementById('loginButton').disabled = false;
+      }
+    };
+    
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+      // Display API URL
+      const apiDomain = window.location.origin;
+      document.getElementById('apiUrl').textContent = apiDomain;
+      
+      // Load saved email from localStorage
+      const savedEmail = localStorage.getItem('userEmail');
+      if (savedEmail) {
+        document.getElementById('email').value = savedEmail;
+      }
+      
+      // Add event listeners
+      document.getElementById('loginButton').addEventListener('click', sendMagicLink);
+      document.getElementById('processLinkBtn').addEventListener('click', processMagicLink);
+      document.getElementById('verifyTokenBtn').addEventListener('click', verifyToken);
+      document.getElementById('copyTokenBtn').addEventListener('click', copyToken);
+      
+      // Add Enter key support
+      document.getElementById('email').addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          sendMagicLink();
+        }
+      });
     });
   </script>
 </body>

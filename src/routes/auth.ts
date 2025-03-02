@@ -12,12 +12,15 @@ const router = express.Router();
 // SuperTokens middleware for all auth routes
 router.use(middleware());
 
-console.log('asdfasdfsdf');
-
 // Route for initiating the magic link flow
-router.post('/magic-link', (async (req, res, next) => {
+router.post('/login', (async (req, res, next) => {
   try {
     const { email } = req.body;
+    let { redirectUrl } = req.body;
+
+    if (!redirectUrl) {
+      redirectUrl = `${process.env.API_DOMAIN}/verify-token`
+    }
 
     if (!email) {
       return res.status(400).json({
@@ -39,13 +42,14 @@ router.post('/magic-link', (async (req, res, next) => {
     const { preAuthSessionId, linkCode } = response;
 
     // Construct the full URL that the user will click on
-    const magicLink = `${websiteDomain}${websiteBasePath}/verify-magic-link?preAuthSessionId=${preAuthSessionId}&linkCode=${linkCode}&rid=passwordless`;
+    const magicLink = `${redirectUrl}?preAuthSessionId=${preAuthSessionId}&linkCode=${linkCode}&rid=passwordless`;
 
     // Send the email manually if needed
     await sendMagicLinkEmail(email, magicLink);
 
     return res.json({
       success: true,
+      magicLink: magicLink,
       message: "Magic link sent successfully"
     });
   } catch (error: any) {
@@ -62,7 +66,7 @@ router.post('/magic-link', (async (req, res, next) => {
 }) as RequestHandler);
 
 // Route for verifying the magic link code
-router.get('/verify-magic-link', (async (req, res, next) => {
+router.get('/callback', (async (req, res, next) => {
   try {
     const { preAuthSessionId, linkCode } = req.query;
 
