@@ -16,9 +16,32 @@ initSupertokens();
 // Initialize Express app
 const app = express();
 
+// Parse whitelist domains from environment variable
+const whitelistedDomains = process.env.WHITELIST_DOMAINS 
+  ? process.env.WHITELIST_DOMAINS.split(',').map(domain => domain.trim())
+  : ['http://localhost:3000']; // Default fallback
+
 // Middleware
 app.use(cors({
-  origin: config.cors.allowedOrigins,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Check if the origin is in our whitelist
+    if (whitelistedDomains.includes(origin) || 
+        whitelistedDomains.some(domain => {
+          // Handle wildcard domains (e.g., *.example.com)
+          if (domain.startsWith('*')) {
+            const domainSuffix = domain.substring(1); // Remove the *
+            return origin.endsWith(domainSuffix);
+          }
+          return false;
+        })) {
+      return callback(null, true);
+    }
+    
+    callback(new Error(`Origin ${origin} not allowed by CORS policy`));
+  },
   credentials: true,
   allowedHeaders: ['content-type', 'authorization'],
 }));
