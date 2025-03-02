@@ -94,6 +94,16 @@
     .step-completed {
       background-color: #10b981;
     }
+    
+    .response-box.expired {
+      background-color: #fee2e2;
+      border: 1px solid #ef4444;
+    }
+    
+    .response-box.expiring-soon {
+      background-color: #fff7ed;
+      border: 1px solid #f97316;
+    }
   </style>
 </head>
 <body>
@@ -246,10 +256,116 @@
         const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
           return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         }).join(''));
+        
         return JSON.parse(jsonPayload);
       } catch (e) {
         console.error('Error parsing JWT:', e);
         return null;
+      }
+    };
+    
+    // Helper function to format time remaining in a human-readable format
+    const formatTimeRemaining = (milliseconds) => {
+      if (milliseconds <= 0) {
+        return "Expired";
+      }
+      
+      // Convert to seconds
+      const seconds = Math.floor(milliseconds / 1000);
+      
+      // Calculate hours, minutes, seconds
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const remainingSeconds = seconds % 60;
+      
+      // Format the string
+      let timeString = "";
+      if (hours > 0) {
+        timeString += `${hours} hour${hours > 1 ? 's' : ''} `;
+      }
+      if (minutes > 0 || hours > 0) {
+        timeString += `${minutes} minute${minutes > 1 ? 's' : ''} `;
+      }
+      timeString += `${remainingSeconds} second${remainingSeconds > 1 ? 's' : ''}`;
+      
+      return timeString;
+    };
+    
+    // Function to display decoded payload with expiration info
+    const displayDecodedPayload = (payload) => {
+      const decodedPayloadElement = document.getElementById('decodedPayload');
+      
+      if (!payload) {
+        decodedPayloadElement.textContent = 'Invalid token format';
+        return;
+      }
+      
+      // Remove our custom _expirationInfo before displaying the payload
+      const displayPayload = {...payload};
+      if (displayPayload._expirationInfo) {
+        delete displayPayload._expirationInfo;
+      }
+      
+      // Display the pure JWT payload
+      decodedPayloadElement.textContent = JSON.stringify(displayPayload, null, 2);
+      
+      // Create or update expiration info section
+      let expirationInfoElement = document.getElementById('expirationInfo');
+      if (!expirationInfoElement) {
+        expirationInfoElement = document.createElement('div');
+        expirationInfoElement.id = 'expirationInfo';
+        expirationInfoElement.style.fontSize = '12px';
+        expirationInfoElement.style.marginTop = '10px';
+        expirationInfoElement.style.color = '#666';
+        decodedPayloadElement.parentNode.appendChild(expirationInfoElement);
+      }
+      
+      // Add expiration helper message if available
+      if (payload.exp) {
+        const expirationTime = payload.exp * 1000; // Convert to milliseconds
+        const currentTime = Date.now();
+        const timeRemaining = expirationTime - currentTime;
+        const isExpired = timeRemaining <= 0;
+        const formattedTime = formatTimeRemaining(timeRemaining);
+        
+        // Format expiration date
+        const expirationDate = new Date(expirationTime).toLocaleString();
+        
+        if (isExpired) {
+          expirationInfoElement.innerHTML = `<strong>Token Status:</strong> ⚠️ EXPIRED ⚠️<br>
+                                            <strong>Expired At:</strong> ${expirationDate}`;
+          expirationInfoElement.style.color = '#ef4444';
+        } else if (timeRemaining < 300000) { // Less than 5 minutes
+          expirationInfoElement.innerHTML = `<strong>Token Status:</strong> ⚠️ Expiring Soon ⚠️<br>
+                                            <strong>Expires At:</strong> ${expirationDate}<br>
+                                            <strong>Time Remaining:</strong> ${formattedTime}`;
+          expirationInfoElement.style.color = '#f97316';
+        } else {
+          expirationInfoElement.innerHTML = `<strong>Token Status:</strong> Valid<br>
+                                            <strong>Expires At:</strong> ${expirationDate}<br>
+                                            <strong>Time Remaining:</strong> ${formattedTime}`;
+          expirationInfoElement.style.color = '#10b981';
+        }
+      } else {
+        expirationInfoElement.textContent = 'No expiration information found in token.';
+        expirationInfoElement.style.color = '#666';
+      }
+      
+      // Update visual indicators on the JSON display based on expiration status
+      if (payload.exp) {
+        const expirationTime = payload.exp * 1000;
+        const currentTime = Date.now();
+        const timeRemaining = expirationTime - currentTime;
+        
+        if (timeRemaining <= 0) {
+          decodedPayloadElement.classList.add('expired');
+          decodedPayloadElement.classList.remove('expiring-soon');
+        } else if (timeRemaining < 300000) {
+          decodedPayloadElement.classList.add('expiring-soon');
+          decodedPayloadElement.classList.remove('expired');
+        } else {
+          decodedPayloadElement.classList.remove('expired', 'expiring-soon');
+        }
       }
     };
     
@@ -323,10 +439,10 @@
           // Show the token column
           document.getElementById('column3').style.display = 'flex';
           
-          // Show the decoded payload
+          // Show the decoded payload with expiration info
           const decodedPayload = parseJwt(data.token);
           if (decodedPayload) {
-            document.getElementById('decodedPayload').textContent = JSON.stringify(decodedPayload, null, 2);
+            displayDecodedPayload(decodedPayload);
           }
           
           // Update step indicators
@@ -376,6 +492,12 @@
         // Show the results column
         document.getElementById('column4').style.display = 'flex';
         
+        // Update decoded payload with expiration info
+        const decodedPayload = parseJwt(token);
+        if (decodedPayload) {
+          displayDecodedPayload(decodedPayload);
+        }
+        
         // Update token status
         if (response.ok && responseData.valid) {
           statusElement.textContent = "VALID ✓";
@@ -418,8 +540,13 @@
         localStorage.setItem('savedRedirectUrl', redirectUrl);
       }
       
-      // Basic validation
-      if (!email || !email.includes('@')) {
+      // Enhanced email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email) {
+        showMessage("Email address is required", "error", 1);
+        return;
+      }
+      if (!emailRegex.test(email)) {
         showMessage("Please enter a valid email address", "error", 1);
         return;
       }
