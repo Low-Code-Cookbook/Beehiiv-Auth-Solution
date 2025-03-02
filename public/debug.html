@@ -136,6 +136,36 @@
           
           <div id="message1" class="message hidden"></div>
           <div id="loader1" class="loader hidden"></div>
+          
+          <!-- New API Info Panel -->
+          <div class="api-info-panel" style="margin-top: 30px; padding: 15px; background-color: #f8fafc; border-radius: 6px; border-left: 4px solid #4f46e5; font-size: 14px;">
+            <h3 style="margin-top: 0; color: #4f46e5;">API Endpoints Reference</h3>
+            
+            <div style="margin-bottom: 15px;">
+              <div style="font-weight: bold; margin-bottom: 3px;">POST /auth/login</div>
+              <div>Request a magic link for authentication.</div>
+              <div style="color: #666; margin-top: 3px; font-size: 13px;">Body: { email: string, redirectUrl?: string }</div>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <div style="font-weight: bold; margin-bottom: 3px;">GET /auth/callback</div>
+              <div>Process a magic link to obtain JWT token.</div>
+              <div style="color: #666; margin-top: 3px; font-size: 13px;">Query params: preAuthSessionId, linkCode</div>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <div style="font-weight: bold; margin-bottom: 3px;">GET /auth/verify</div>
+              <div>Verify if a JWT token is valid.</div>
+              <div style="color: #666; margin-top: 3px; font-size: 13px;">Header: Authorization: Bearer {token}</div>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <div style="font-weight: bold; margin-bottom: 3px;">POST /auth/refresh</div>
+              <div>Refresh an existing JWT token to extend its validity.</div>
+              <div style="color: #666; margin-top: 3px; font-size: 13px;">Cookie: refresh_token</div>
+            </div>
+            
+          </div>
         </div>
         
         <div class="column-footer">

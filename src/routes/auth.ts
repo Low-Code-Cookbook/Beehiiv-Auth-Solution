@@ -3,7 +3,7 @@ import { middleware } from 'supertokens-node/framework/express';
 import { verifyToken, refreshToken } from '../controllers/auth';
 import { requireAuth, refreshTokenMiddleware } from '../middleware/auth';
 import Passwordless from 'supertokens-node/recipe/passwordless';
-import { generateJwt } from '../utils/jwt';
+import { generateJwt, generateRefreshToken } from '../utils/jwt';
 import { verifyBeehiivSubscriber } from '../utils/beehiiv';
 import config from '../config';
 import { sendMagicLinkEmail } from '../services/emailService';
@@ -128,7 +128,17 @@ router.get('/callback', (async (req, res, next) => {
 
       // Generate JWT token directly without SuperTokens session
       const jwt = generateJwt(userId, email);
+      const refreshToken = generateRefreshToken(userId, email);
 
+      // Store refresh token in HTTP-only cookie
+      res.cookie('refresh_token', refreshToken, {
+        httpOnly: true,
+        secure: true,
+         // @ts-ignore
+        sameSite: 'Strict',
+        path: '/auth/refresh', // Restrict usage to refresh endpoint
+      });
+      
       // Return the token
       return res.json({
         success: true,

@@ -141,10 +141,10 @@ After deploying to Railway, you need to configure your environment variables in 
 
 ## API Endpoints
 
+- `GET /auth/login` - Use email to generate a magic link.
 - `GET /auth/callback` - Handles successful authentication with SuperTokens
 - `GET /auth/verify` - Verifies JWT token and checks subscription status
 - `POST /auth/refresh` - Refreshes expired JWT tokens
-- `POST /auth/logout` - Logs out the user and revokes the session
 
 ## Integration with Frontend
 
