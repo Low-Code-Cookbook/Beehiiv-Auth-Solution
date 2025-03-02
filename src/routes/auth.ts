@@ -119,9 +119,9 @@ router.post('/login', (async (req, res, next) => {
 }) as RequestHandler);
 
 // Route for verifying the magic link code
-router.get('/callback', (async (req, res, next) => {
+router.post('/callback', (async (req, res, next) => {
   try {
-    const { preAuthSessionId, linkCode } = req.query;
+    const { preAuthSessionId, linkCode } = req.body;
 
     if (!preAuthSessionId || !linkCode) {
       return res.status(400).json({

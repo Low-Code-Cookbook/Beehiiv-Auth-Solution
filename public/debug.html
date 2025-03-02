@@ -506,11 +506,12 @@
         }
         
         // Call the callback endpoint with the extracted parameters
-        const response = await fetch(`/auth/callback?preAuthSessionId=${preAuthSessionId}&linkCode=${linkCode}`, {
-          method: 'GET',
+        const response = await fetch(`/auth/callback`, {
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json'
-          }
+          },
+          body: JSON.stringify({ preAuthSessionId, linkCode })
         });
         
         const data = await response.json();
