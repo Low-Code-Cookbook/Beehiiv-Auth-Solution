@@ -35,7 +35,7 @@ router.post('/login', (async (req, res, next) => {
 
     if (!isSubscriber) {
       // Revoke the session if the user is no longer a subscriber
-      return res.status(400).json({ success: false, message: 'You are not subscribed.' });
+      return res.status(400).json({ success: false, message: 'You are not subscribed to the Low Code CTO newsletter.' });
     }
 
     // Create the magic link using SuperTokens
