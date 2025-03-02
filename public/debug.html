@@ -229,6 +229,13 @@
         </div>
         
         <div class="column-body">
+          <!-- New Request Payload Panel -->
+          <div class="form-group">
+            <label>Request Payload:</label>
+            <pre id="requestPayload" class="response-box" style="background-color: #f8f9fc; font-family: monospace; font-size: 14px; padding: 10px; white-space: pre; overflow-x: auto; overflow-y: visible;">No request data yet</pre>
+            <small style="display: block; margin-top: 5px; color: #666;">POST to /auth/login with this JSON body</small>
+          </div>
+          
           <div class="form-group">
             <label>Magic Link URL:</label>
             <div id="magicLinkDisplay" class="response-box" style="word-break: break-all; font-size: 14px; overflow-wrap: break-word;"></div>
@@ -283,17 +290,17 @@
           <div class="verification-results">
             <div class="form-group">
               <label>Token Status:</label>
-              <div id="tokenStatus" class="status-box">Not verified yet</div>
+              <div id="tokenStatus" style="padding-left: 5px;" class="status-box">Not verified yet</div>
             </div>
             
             <div class="form-group">
               <label>Decoded Payload:</label>
-              <pre id="decodedPayload" class="response-box">No data yet</pre>
+              <pre id="decodedPayload" class="response-box" style="background-color: #f8f9fc; font-family: monospace; font-size: 14px; padding: 10px; white-space: pre; overflow-x: auto; overflow-y: visible;">No data yet</pre>
             </div>
             
             <div class="form-group">
               <label>API Response:</label>
-              <pre id="apiResponse" class="response-box">No response yet</pre>
+              <pre id="apiResponse" class="response-box" style="background-color: #f8f9fc; font-family: monospace; font-size: 14px; padding: 10px; white-space: pre; overflow-x: auto; overflow-y: visible;">No response yet</pre>
             </div>
           </div>
         </div>
@@ -653,7 +660,8 @@
       try {
         // Send magic link using direct API call
         const apiUrl = '/auth/login';
-
+        console.log(`Sending request to: ${apiUrl}`);
+        
         // Prepare request body - include redirectUrl only if provided
         const requestBody = {
           email
@@ -663,6 +671,9 @@
           requestBody.redirectUrl = redirectUrl;
         }
         
+        // Display the request payload in the panel
+        document.getElementById('requestPayload').textContent = JSON.stringify(requestBody, null, 2);
+        
         const response = await fetch(apiUrl, {
           method: 'POST',
           headers: {
@@ -670,6 +681,8 @@
           },
           body: JSON.stringify(requestBody)
         });
+        
+        console.log(`Response status: ${response.status} ${response.statusText}`);
         
         // Check response type
         const contentType = response.headers.get("content-type");
@@ -681,7 +694,8 @@
         }
         
         const data = await response.json();
-
+        console.log("Response data:", data);
+        
         if (response.ok && data.success) {
           // Save email to localStorage on successful request
           localStorage.setItem('userEmail', email);
