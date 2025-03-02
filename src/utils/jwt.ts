@@ -21,12 +21,39 @@ interface RefreshPayload {
  * @returns The generated JWT token
  */
 export const generateJwt = (userId: string, email: string): string => {
+  // Get expiration time from environment or default to 24 hours
+  const getTokenExpirationSeconds = (): number => {
+    try {
+      // Check if environment variable exists
+      const envValue = process.env.REFRESH_TOKEN_EXPIRES_IN;
+      
+      if (!envValue) {
+        console.log('REFRESH_TOKEN_EXPIRES_IN not set, using default 24 hours');
+        return 24 * 60 * 60; // 24 hours in seconds
+      }
+      
+      // Try to parse the value as a number
+      const parsedValue = Number(envValue);
+      
+      if (isNaN(parsedValue)) {
+        console.warn(`Invalid REFRESH_TOKEN_EXPIRES_IN value: "${envValue}", using default`);
+        return 24 * 60 * 60;
+      }
+      
+      console.log(`Using token expiration from env: ${parsedValue} seconds`);
+      return parsedValue;
+    } catch (error) {
+      console.error('Error reading token expiration from env:', error);
+      return 24 * 60 * 60; // Default fallback
+    }
+  };
 
+  // Create JWT payload with dynamic expiration
   const payload: JwtPayload = {
     userId,
     email,
     iat: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60),
+    exp: Math.floor(Date.now() / 1000) + getTokenExpirationSeconds(),
   };
   
   // Using string directly for secret to avoid type issues
@@ -39,15 +66,15 @@ export const generateJwt = (userId: string, email: string): string => {
  * @param sessionId SuperTokens session ID
  * @returns The generated refresh token
  */
-export const generateRefreshToken = (userId: string, sessionId: string): string => {
+export const generateRefreshToken = (userId: string, email: string): string => {
   const payload = {
     userId,
-    sessionId,
+    email,
     type: 'refresh',
   };
   
   // Using string directly for secret to avoid type issues
-  return jwt.sign(payload, config.jwt.secret);
+  return jwt.sign(payload, process.env.JWT_REFRESH_SECRET || "");
 };
 
 /**
@@ -87,4 +114,25 @@ export const verifyRefreshToken = (token: string): { userId: string; sessionId: 
     console.error('Error verifying refresh token:', error);
     return null;
   }
-}; 
+};
+
+// Helper function to get expiration time from env variable or default
+function getExpirationTime(): number {
+  if (!process.env.REFRESH_TOKEN_EXPIRES_IN) {
+    // Default to 24 hours (in seconds) if environment variable is not set
+    return 24 * 60 * 60;
+  }
+  
+  const parsedValue = parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN, 10);
+  
+  // Check if the parsed value is a valid number
+  if (isNaN(parsedValue) || parsedValue <= 0) {
+    console.warn(
+      `Invalid REFRESH_TOKEN_EXPIRES_IN value: "${process.env.REFRESH_TOKEN_EXPIRES_IN}". ` +
+      `Using default expiration time of 24 hours.`
+    );
+    return 24 * 60 * 60; // Default to 24 hours
+  }
+  
+  return parsedValue;
+} 

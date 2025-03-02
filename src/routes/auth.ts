@@ -42,6 +42,7 @@ router.post('/login', (async (req, res, next) => {
     } else {
       // Safe list of domains allows for custom redirect URLs
       // Allow for wildcard subdomains
+
       const url = new URL(redirectUrl);
       if (!isAllowedDomain(url.hostname, allowedDomains)) {
         return res.status(400).json({ 

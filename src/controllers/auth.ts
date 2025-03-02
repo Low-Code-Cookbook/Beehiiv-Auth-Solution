@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { generateJwt, generateRefreshToken } from '../utils/jwt';
+import { generateJwt } from '../utils/jwt';
 import { verifyBeehiivSubscriber } from '../utils/beehiiv';
 
 /**
