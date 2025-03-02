@@ -21,11 +21,19 @@ const whitelistedDomains = process.env.WHITELIST_DOMAINS
   ? process.env.WHITELIST_DOMAINS.split(',').map(domain => domain.trim())
   : ['http://localhost:3000']; // Default fallback
 
+// Flag to allow all CORS origins (for development/testing)
+const allowAllCors = process.env.ALLOW_ALL_CORS === 'true';
+
 // Middleware
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps, curl requests)
     if (!origin) return callback(null, true);
+    
+    // Allow all origins if the flag is set
+    if (allowAllCors) {
+      return callback(null, true);
+    }
     
     // Check if the origin is in our whitelist
     if (whitelistedDomains.includes(origin) || 
