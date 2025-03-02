@@ -8,6 +8,38 @@
   <title>Magic Link Authentication - Beehiiv Auth</title>
   <link rel="stylesheet" href="styles.css">
   <style>
+    /* Reset defaults to fix scrolling issues */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+    }
+    
+    body {
+      padding: 20px;
+      margin: 0;
+      overflow-y: auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Container styles to ensure content stays in viewport */
+    .container {
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      padding-top: 20px; /* Ensure top content is visible */
+      overflow: visible;
+      flex: 1;
+    }
+    
     /* Additional styles for multi-column layout */
     .columns-container {
       display: flex;
@@ -22,25 +54,31 @@
     .column {
       flex: 1;
       min-width: 300px;
-      max-width: 450px; /* Add max-width for single column */
+      max-width: 450px;
       background-color: white;
       border-radius: 8px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      margin-bottom: 20px;
+      height: auto; /* Allow height to adjust to content */
+      max-height: 95vh; /* Limit maximum height */
     }
     
     /* Special styling when there's only one visible column */
     #column1:only-of-type {
       margin: 0 auto;
-      flex: 0 1 400px; /* Don't grow, can shrink, base width */
+      flex: 0 1 400px;
     }
     
     .column-header {
       padding: 15px;
       background-color: #4f46e5;
       color: white;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
     
     .column-header h2 {
@@ -51,8 +89,7 @@
     .column-body {
       padding: 20px;
       flex-grow: 1;
-      overflow-y: auto;
-      max-height: calc(100vh - 200px);
+      overflow-y: auto; /* Enable scrolling within column */
     }
     
     .column-footer {
@@ -61,18 +98,28 @@
       border-top: 1px solid #eee;
       font-size: 14px;
       color: #666;
+      position: sticky;
+      bottom: 0;
+      z-index: 10;
     }
     
-    /* Ensure the page has enough height */
-    body {
-      min-height: 100vh;
-      padding: 20px;
+    /* Ensure main heading doesn't get cut off */
+    h1 {
+      text-align: center;
+      margin: 0 0 20px 0;
+      padding-top: 10px;
     }
     
-    .container {
-      width: 100%;
-      max-width: 100%;
-      padding: 0;
+    /* Make the API info panel scrollable */
+    .api-info-panel {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-top: 20px; 
+      padding: 15px; 
+      background-color: #f8fafc; 
+      border-radius: 6px; 
+      border-left: 4px solid #4f46e5; 
+      font-size: 14px;
     }
     
     /* Status indicator for columns */
@@ -110,7 +157,9 @@
 </head>
 <body>
   <div class="container">
-    <h1 style="text-align: center; margin-bottom: 20px;">Beehiiv App Authentication</h1>
+    <h1 style="text-align: center; margin-bottom: 20px;">
+      &nbsp;
+    </h1>
     
     <div class="columns-container">
       <!-- Column 1: Send Magic Link -->
@@ -604,8 +653,7 @@
       try {
         // Send magic link using direct API call
         const apiUrl = '/auth/login';
-        console.log(`Sending request to: ${apiUrl}`);
-        
+
         // Prepare request body - include redirectUrl only if provided
         const requestBody = {
           email
@@ -623,8 +671,6 @@
           body: JSON.stringify(requestBody)
         });
         
-        console.log(`Response status: ${response.status} ${response.statusText}`);
-        
         // Check response type
         const contentType = response.headers.get("content-type");
         if (!contentType || !contentType.includes("application/json")) {
@@ -635,8 +681,7 @@
         }
         
         const data = await response.json();
-        console.log("Response data:", data);
-        
+
         if (response.ok && data.success) {
           // Save email to localStorage on successful request
           localStorage.setItem('userEmail', email);
