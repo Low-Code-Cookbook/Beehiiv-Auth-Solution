@@ -116,7 +116,7 @@
           
           <div class="form-group">
             <label for="redirectUrl">Redirect URL</label>
-            <input type="text" id="redirectUrl" placeholder="https://example.com/callback" value="https://apps.XXX.lowcodeCTO.com">
+            <input type="text" id="redirectUrl" placeholder="https://example.com/callback" value="">
             <small style="display: block; margin-top: 5px; color: #666;">Leave empty to use the default redirect URL</small>
           </div>
           
@@ -413,6 +413,11 @@
       const email = document.getElementById('email').value.trim();
       const redirectUrl = document.getElementById('redirectUrl').value.trim();
       
+      // Save redirectUrl to localStorage
+      if (redirectUrl) {
+        localStorage.setItem('savedRedirectUrl', redirectUrl);
+      }
+      
       // Basic validation
       if (!email || !email.includes('@')) {
         showMessage("Please enter a valid email address", "error", 1);
@@ -513,11 +518,27 @@
         document.getElementById('email').value = savedEmail;
       }
       
+      // Load saved redirectUrl from localStorage
+      const savedRedirectUrl = localStorage.getItem('savedRedirectUrl');
+      if (savedRedirectUrl) {
+        document.getElementById('redirectUrl').value = savedRedirectUrl;
+      }
+      
       // Add event listeners
       document.getElementById('loginButton').addEventListener('click', sendMagicLink);
       document.getElementById('processLinkBtn').addEventListener('click', processMagicLink);
       document.getElementById('verifyTokenBtn').addEventListener('click', verifyToken);
       document.getElementById('copyTokenBtn').addEventListener('click', copyToken);
+      
+      // Save redirectUrl when it changes
+      document.getElementById('redirectUrl').addEventListener('change', function() {
+        const redirectUrl = this.value.trim();
+        if (redirectUrl) {
+          localStorage.setItem('savedRedirectUrl', redirectUrl);
+        } else {
+          localStorage.removeItem('savedRedirectUrl');
+        }
+      });
       
       // Add Enter key support
       document.getElementById('email').addEventListener('keypress', (event) => {
