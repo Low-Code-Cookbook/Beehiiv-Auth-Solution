@@ -16,11 +16,12 @@ export const verifyToken = async (req: Request, res: Response) => {
     }
     
     // Verify the user is still a Beehiiv subscriber
-    const isSubscriber = await verifyBeehiivSubscriber(req.user.email);
+    const subscriber = await verifyBeehiivSubscriber(req.user.email);
     
-    if (!isSubscriber) {
+    if (!subscriber) {
       return res.status(403).json({
         valid: false,
+        actionCode: 'noSubscriber',
         message: 'Subscription required',
       });
     }
@@ -29,6 +30,7 @@ export const verifyToken = async (req: Request, res: Response) => {
     
     return res.json({
       valid: true,
+      subscriber: subscriber || {},
       user: {
         userId,
         email,
@@ -67,11 +69,12 @@ export const refreshToken = async (req: Request, res: Response) => {
     }
     
     // Verify the user is still a Beehiiv subscriber
-    const isSubscriber = await verifyBeehiivSubscriber(req.user.email);
+    const subscriber = await verifyBeehiivSubscriber(req.user.email);
     
-    if (!isSubscriber) {
+    if (!subscriber) {
       return res.status(403).json({
         success: false,
+        actionCode: 'noSubscriber',
         message: 'Subscription required',
       });
     }

@@ -13,7 +13,7 @@ interface BeehiivSubscriber {
  * @param email The email to verify
  * @returns Promise<boolean> True if the email belongs to a subscriber
  */
-export const verifyBeehiivSubscriber = async (email: string): Promise<boolean> => {
+export const verifyBeehiivSubscriber = async (email: string): Promise<boolean|null|any> => {
   try {
     // Beehiiv API endpoints
     const searchUrl = `https://api.beehiiv.com/v2/publications/${config.beehiiv.publicationId}/subscriptions/by_email/${email}`;
@@ -27,14 +27,18 @@ export const verifyBeehiivSubscriber = async (email: string): Promise<boolean> =
     });
     
     // Only if the subscriber is found, return true.
-    if (response.data.data.status === 'active') {
-      return true;
+    if (!response.data.data) {
+      return null;
     }
 
-    return false;
+    return {
+      subscriber: response.data.data,
+      success: true,
+    }
+
   } catch (error: any) {
     console.error('Error verifying Beehiiv subscriber:', error.message);
     // In case of API failure, we should fail closed (deny access)
-    return false;
+    return null;
   }
 }; 

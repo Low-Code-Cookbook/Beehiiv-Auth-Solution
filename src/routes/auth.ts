@@ -62,11 +62,22 @@ router.post('/login', (async (req, res, next) => {
     }
 
     // Verify the user is still a subscriber
-    const isSubscriber = await verifyBeehiivSubscriber(email);
+    const subscriber = await verifyBeehiivSubscriber(email);
 
-    if (!isSubscriber) {
+    if (!subscriber) {
       // Revoke the session if the user is no longer a subscriber
-      return res.status(400).json({ success: false, message: 'You are not subscribed to the Low Code CTO newsletter.' });
+      return res.status(400).json({ 
+        success: false, 
+        message: 'You are not subscribed to the Low Code CTO newsletter.' 
+      });
+    } else {
+      if (subscriber.status !== 'active') {
+        return res.status(400).json({ 
+          success: false, 
+          actionCode: 'inactiveSubscriber',
+          message: 'You are not an active subscriber to the Low Code CTO newsletter.' 
+        });
+      }
     }
 
     // Create the magic link using SuperTokens
@@ -127,6 +138,7 @@ router.get('/callback', (async (req, res, next) => {
     });
 
     if (response.status === "OK") {
+      
       // Get user information
       const userId = response.user.id;
       const email = response.user.emails[0]; // Assuming the first email is the primary one
@@ -170,7 +182,6 @@ router.get('/callback', (async (req, res, next) => {
 // @ts-ignore
 router.get('/verify', requireAuth, (async (req, res, next) => {
   try {
-    console.log('verify');
     await verifyToken(req, res);
   } catch (error) {
     next(error);

@@ -10,6 +10,7 @@ declare global {
       user?: {
         userId: string;
         email: string;
+        name?: string;
       };
     }
   }
@@ -59,9 +60,9 @@ export const requireSubscription = async (req: Request, res: Response, next: Nex
     }
     
     // Verify the user is still a subscriber
-    const isSubscriber = await verifyBeehiivSubscriber(req.user.email);
+    const subscriber = await verifyBeehiivSubscriber(req.user.email);
     
-    if (!isSubscriber) {
+    if (!subscriber) {
       // Revoke the session if the user is no longer a subscriber
       return res.status(403).json({ error: 'Subscription required' });
     }

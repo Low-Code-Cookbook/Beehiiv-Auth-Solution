@@ -33,9 +33,9 @@ export const initSupertokens = () => {
                 await sendMagicLinkEmail(input.email, input.urlWithLinkCode);
 
                 // // Before sending magic link, check if the email is a Beehiiv subscriber
-                const isSubscriber = await verifyBeehiivSubscriber(input.email);
+                const subscriber = await verifyBeehiivSubscriber(input.email);
                 
-                if (!isSubscriber) {
+                if (!subscriber) {
                   // If not a subscriber, throw an error
                   throw new Error('Email is not a Beehiiv subscriber');
                 }
