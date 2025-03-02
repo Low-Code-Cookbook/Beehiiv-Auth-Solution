@@ -32,7 +32,7 @@ export const verifyBeehiivSubscriber = async (email: string): Promise<boolean|nu
     }
 
     return {
-      subscriber: response.data.data,
+      subscriber: response.data.data.subscriber,
       success: true,
     }
 

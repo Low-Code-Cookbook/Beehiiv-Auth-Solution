@@ -30,7 +30,6 @@ export const verifyToken = async (req: Request, res: Response) => {
     
     return res.json({
       valid: true,
-      subscriber,
       user: {
         userId,
         email,
