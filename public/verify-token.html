@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Token Verification - Beehiiv Auth</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h1>JWT Token Verification</h1>
+        <p>Paste your JWT token to verify its validity</p>
+      </div>
+      
+      <div class="card-body">
+        <div class="form-group">
+          <label for="tokenInput">JWT Token</label>
+          <textarea id="tokenInput" placeholder="Paste your JWT token here..."></textarea>
+        </div>
+        
+        <button id="verifyButton" class="btn-primary">Verify Token</button>
+        
+        <div id="message" class="message hidden"></div>
+        <div id="loader" class="loader hidden"></div>
+        
+        <div class="token-info-area" style="margin-top: 25px;">
+          <h3>Token Information</h3>
+          
+          <div class="form-group">
+            <label>Token Status</label>
+            <div id="tokenStatus" class="status-box">Not verified yet</div>
+          </div>
+          
+          <div class="form-group">
+            <label>Decoded Payload</label>
+            <pre id="decodedPayload" class="response-box">No data yet</pre>
+          </div>
+          
+          <div class="form-group">
+            <label>API Response</label>
+            <pre id="apiResponse" class="response-box">No response yet</pre>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card-footer">
+        <p>Use this page to verify any JWT token with the Beehiiv Auth API.</p>
+        <p><a href="index.html">Login Page</a> | <a href="dashboard.html">Dashboard</a></p>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Function to parse JWT token (client-side only)
+    const parseJwt = (token) => {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+      } catch (e) {
+        console.error('Error parsing JWT:', e);
+        return null;
+      }
+    };
+    
+    // Function to show messages
+    const showMessage = (text, type = "success") => {
+      const messageDiv = document.getElementById('message');
+      messageDiv.textContent = text;
+      messageDiv.classList.remove('hidden', 'success', 'error');
+      messageDiv.classList.add(type);
+    };
+    
+    // Function to verify token with the API
+    const verifyToken = async () => {
+      const token = document.getElementById('tokenInput').value.trim();
+      const statusElement = document.getElementById('tokenStatus');
+      const payloadElement = document.getElementById('decodedPayload');
+      const responseElement = document.getElementById('apiResponse');
+      const loader = document.getElementById('loader');
+      const verifyButton = document.getElementById('verifyButton');
+      
+      if (!token) {
+        showMessage("Please enter a token to verify", "error");
+        return;
+      }
+      
+      // Show loading state
+      loader.classList.remove('hidden');
+      verifyButton.disabled = true;
+      
+      try {
+        // Attempt to decode the token locally first
+        const decodedPayload = parseJwt(token);
+        
+        if (decodedPayload) {
+          payloadElement.textContent = JSON.stringify(decodedPayload, null, 2);
+          payloadElement.className = 'response-box';
+        } else {
+          payloadElement.textContent = "Invalid token format - could not decode";
+          payloadElement.className = 'response-box error';
+        }
+        
+        // Verify with API
+        const response = await fetch('/auth/verify', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        // Get response as text first
+        const responseText = await response.text();
+        
+        // Try to parse as JSON
+        try {
+          const responseData = JSON.parse(responseText);
+          responseElement.textContent = JSON.stringify(responseData, null, 2);
+          
+          // Update token status
+          if (response.ok && responseData.valid) {
+            statusElement.textContent = "VALID ✓";
+            statusElement.className = 'status-box success';
+            showMessage("Token is valid!", "success");
+          } else {
+            statusElement.textContent = "INVALID ✗";
+            statusElement.className = 'status-box error';
+            showMessage(responseData.message || "Token is invalid", "error");
+          }
+        } catch (e) {
+          // If not JSON, show as text
+          responseElement.textContent = responseText;
+          responseElement.className = 'response-box error';
+          
+          statusElement.textContent = "ERROR";
+          statusElement.className = 'status-box error';
+          showMessage("Received non-JSON response", "error");
+        }
+      } catch (error) {
+        statusElement.textContent = "ERROR";
+        statusElement.className = 'status-box error';
+        responseElement.textContent = `Error: ${error.message}`;
+        responseElement.className = 'response-box error';
+        showMessage(`Verification error: ${error.message}`, "error");
+      } finally {
+        loader.classList.add('hidden');
+        verifyButton.disabled = false;
+      }
+    };
+    
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('verifyButton').addEventListener('click', verifyToken);
+      
+      // Allow verification on Enter key in textarea
+      document.getElementById('tokenInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && e.ctrlKey) {
+          e.preventDefault();
+          verifyToken();
+        }
+      });
+    });
+  </script>
+</body>
+</html> 

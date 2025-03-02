@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magic Link Authentication - Beehiiv Auth</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h1>Magic Link Authentication</h1>
+        <p>Enter your email address to receive a magic link</p>
+      </div>
+      
+      <div class="card-body">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="your.email@example.com" required>
+        </div>
+        
+        <button id="loginButton" class="btn-primary">Send Magic Link</button>
+        <button id="testApiButton" class="btn-primary" style="margin-top: 10px; background-color: #10b981;">Test API Connection</button>
+        
+        <div id="message" class="message hidden"></div>
+        <div id="loader" class="loader hidden"></div>
+      </div>
+      
+      <div class="card-footer">
+        <p>This is a test authentication system using Magic Links.</p>
+        <p class="api-url">API URL: <span id="apiUrl"></span></p>
+      </div>
+    </div>
+  </div>
+  
+  <script src="app.js"></script>
+  <script>
+    document.getElementById('testApiButton').addEventListener('click', async function() {
+      try {
+        showMessage("Testing API connection...", "");
+        const response = await fetch('/health');
+        if (response.ok) {
+          const data = await response.json();
+          showMessage(`API Connected! Status: ${data.status || 'OK'}`, "success");
+        } else {
+          showMessage(`API Error: ${response.status} ${response.statusText}`, "error");
+        }
+      } catch (error) {
+        showMessage(`API Connection Failed: ${error.message}`, "error");
+      }
+    });
+  </script>
+</body>
+</html>
