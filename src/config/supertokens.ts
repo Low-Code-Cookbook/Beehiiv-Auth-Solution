@@ -23,6 +23,8 @@ export const initSupertokens = () => {
       Passwordless.init({
         contactMethod: 'EMAIL',
         flowType: 'MAGIC_LINK',
+        // @ts-ignore
+        magicLinkValidityPeriod: 24 * 60 * 60 * 1000,
         emailDelivery: {
           override: (originalImplementation) => {
             return {
