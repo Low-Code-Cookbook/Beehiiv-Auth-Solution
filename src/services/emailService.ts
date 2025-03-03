@@ -11,7 +11,7 @@ export async function sendMagicLinkEmail(to: string, magicLink: string, name?: s
       TemplateId: Number(process.env.POSTMARK_TEMPLATE_ID || "0"),
       TemplateModel: {
         magicLink: magicLink,
-        name: name
+        name: name || to || "Subscriber"
       },
       MessageStream: "outbound"
     });
