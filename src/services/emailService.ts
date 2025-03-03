@@ -6,7 +6,7 @@ const client = new postmark.ServerClient(process.env.POSTMARK_API_KEY || '');
 export async function sendMagicLinkEmail(to: string, magicLink: string, nickName?: string): Promise<void> {
   try {
     await client.sendEmailWithTemplate({
-      From: "no-reply@lowcodecto.com",
+      From: "Low Code CTO <no-reply@lowcodecto.com>",
       To: to,
       TemplateId: Number(process.env.POSTMARK_TEMPLATE_ID || "0"),
       TemplateModel: {
