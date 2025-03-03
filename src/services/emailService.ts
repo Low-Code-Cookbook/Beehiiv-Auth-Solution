@@ -3,7 +3,7 @@ import * as postmark from 'postmark';
 // Initialize Postmark client
 const client = new postmark.ServerClient(process.env.POSTMARK_API_KEY || '');
 
-export async function sendMagicLinkEmail(to: string, magicLink: string, name?: string): Promise<void> {
+export async function sendMagicLinkEmail(to: string, magicLink: string, nickName?: string): Promise<void> {
   try {
     await client.sendEmailWithTemplate({
       From: "no-reply@lowcodecto.com",
@@ -11,7 +11,7 @@ export async function sendMagicLinkEmail(to: string, magicLink: string, name?: s
       TemplateId: Number(process.env.POSTMARK_TEMPLATE_ID || "0"),
       TemplateModel: {
         magicLink: magicLink,
-        name: name || to || "Subscriber"
+        nickName: nickName || to || "Subscriber"
       },
       MessageStream: "outbound"
     });

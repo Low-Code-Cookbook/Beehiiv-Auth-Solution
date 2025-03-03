@@ -96,7 +96,7 @@ router.post('/login', (async (req, res, next) => {
     const magicLink = `${redirectUrl}?preAuthSessionId=${preAuthSessionId}&linkCode=${linkCode}&rid=passwordless`;
 
     // Send the email manually if needed
-    await sendMagicLinkEmail(email, magicLink);
+    await sendMagicLinkEmail(email, magicLink, subscriber.customFields?.nickName);
 
     return res.json({
       success: true,

@@ -6,7 +6,21 @@ interface BeehiivSubscriber {
   email: string;
   status: string;
   created: string;
+  customFields: any;
 }
+
+interface CustomField {
+  name: string;
+  kind: string;
+  value: any;
+}
+
+export const transformCustomFields = (customFields: CustomField[]): Record<string, any> => {
+  return customFields.reduce((acc, field) => {
+    acc[field.name] = field.value;
+    return acc;
+  }, {} as Record<string, any>);
+};
 
 /**
  * Verify if an email belongs to a Beehiiv subscriber
@@ -24,6 +38,9 @@ export const verifyBeehiivSubscriber = async (email: string): Promise<boolean|nu
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${config.beehiiv.apiKey}`,
       },
+      params: {
+        expand: ['custom_fields'],
+      },
     });
     
     // Only if the subscriber is found, return true.
@@ -31,17 +48,16 @@ export const verifyBeehiivSubscriber = async (email: string): Promise<boolean|nu
       return null;
     }
 
-    console.log('response.data.data', response.data.data);
-
-    const subscriberData = {
+    const subscriberData: any = {
       status: response.data.data.status,
       email: response.data.data.email || email,
       subscription_tier: response.data.data.subscription_tier,
       id: response.data.data.id,
       created: response.data.data.created,
+      customFields: transformCustomFields(response.data.data.custom_fields || []),
     };
 
-    console.log('subscriberData', subscriberData);
+    console.log('Subscriber Data', subscriberData);
 
     return subscriberData;
   } catch (error: any) {

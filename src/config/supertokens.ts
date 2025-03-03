@@ -32,7 +32,7 @@ export const initSupertokens = () => {
               sendEmail: async (input) => {
                 console.log('Sending email:', input);
 
-                await sendMagicLinkEmail(input.email, input.urlWithLinkCode);
+                await sendMagicLinkEmail(input.email, input.urlWithLinkCode, "");
 
                 // // Before sending magic link, check if the email is a Beehiiv subscriber
                 const subscriber = await verifyBeehiivSubscriber(input.email);
