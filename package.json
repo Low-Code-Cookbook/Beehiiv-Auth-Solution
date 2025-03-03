@@ -9,15 +9,20 @@
     "migrate": "ts-node src/models/migration.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["beehiiv", "auth", "api", "nodejs", "typescript"],
+  "keywords": [
+    "beehiiv",
+    "auth",
+    "api",
+    "nodejs",
+    "typescript"
+  ],
   "author": "Stephan Smith",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@types/node": "^22.13.9",
     "@types/express": "^5.0.0",
+    "@types/node": "^22.13.9",
     "axios": "^1.8.1",
-    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -29,7 +34,6 @@
     "supertokens-node": "^21.1.0"
   },
   "devDependencies": {
-    "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/morgan": "^1.9.9",

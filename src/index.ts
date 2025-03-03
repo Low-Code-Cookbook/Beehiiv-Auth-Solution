@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import cookieParser from 'cookie-parser';
 import { errorHandler } from 'supertokens-node/framework/express';
 import { initSupertokens } from './config/supertokens';
 import config from './config';
@@ -55,7 +54,6 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use(cookieParser());
 app.use(morgan('dev'));
 
 // Serve static files from the public directory
