@@ -14,11 +14,10 @@ A backend Node.js Express application that provides magic link authentication vi
 
 - Node.js + Express.js
 - SuperTokens for authentication
-- PostgreSQL (Railway DB)
 - JWT for token management
-- Beehiiv API integration
+- Beehiiv API integration (Render.com)
 - TypeScript
-- Docker support
+- Email - Postmark.com
 
 ## Prerequisites
 
