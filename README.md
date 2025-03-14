@@ -39,10 +39,14 @@ to pass the https://apps.stack.lowcodeCTO.com redirect URL along with the email 
 ```
 
 ```
-Second, I want you to add a route that will accept the linkCode to 
+Second, I want you to add a route that will accept the 'linkCode' to 
 trigger an exchange of the code for a JWT Session token using the 
 https://access.lowcodeCTO.com/auth/callback. When it returns a JWT
-token, please store the JWT token.
+token, please store the JWT token in localstorage.
+
+The LinkCode is in the query params. Also when the JWT is 
+exchanged with the API, please remove the query params from
+the URL so that app looks nice.
 ```
 
 ```
