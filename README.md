@@ -5,6 +5,12 @@ A backend Node.js Express application that provides magic link authentication vi
 Read more about it on my [Low Code CTO - Beehiiv as an Identity Provider](https://lowcodecto/p/beehiiv-as-my-login). I explain
 the Low Code approach to using Beehiiv and not Firebase Auth, Auth0, Okta or any number of other solutions.
 
+## Screenshots
+
+<img src="assets/stack.png" alt="Alt text" width="500"/>
+<img src="assets/ui.png" alt="Alt text" width="500"/>
+<img src="assets/api-test-harness.png" alt="Alt text" width="500"/>
+
 ## Business Need
 
 I have come to believe that every part of a companies technology stack needs to be 
@@ -18,6 +24,9 @@ adapt and use this to drive value outside of their core content on Beehiiv.
 (Now, if Beehiiv was creative, this might be a good feature to add for content 
 creators.)
 
+## Low Code vs No-Code
+This is not no-code. Sad. But it meets my requirements. It takes code and complexity
+out of the solution, by using the smallest amount possible. A first 
 ## Security Warnings
 
 Using magic links is not the most secure way to limit access to anything. On the 
@@ -27,7 +36,7 @@ and it cheap.
 
 Cheap is good!
 
-One last comment on securioty. I do not create the single-use URLs, SuperTokens
+One last comment on security. I do not create the single-use URLs, SuperTokens
 does. This is their business.
 
 ## Features

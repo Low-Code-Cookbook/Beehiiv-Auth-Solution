@@ -62,7 +62,6 @@ router.post('/login', (async (req, res, next) => {
     }
 
     // Verify the user is still a subscriber
-    console.log('Prompt Email', email);
     const subscriber = await verifyBeehiivSubscriber(email);
 
     if (!subscriber) {
@@ -72,7 +71,7 @@ router.post('/login', (async (req, res, next) => {
         message: 'You are not subscribed to the Low Code CTO newsletter.' 
       });
     } else {
-      console.log('Heree subscriber:', subscriber);
+      console.log('Subsciber Info:', subscriber);
       if (subscriber.status !== 'active') {
         return res.status(400).json({ 
           success: false, 
@@ -100,7 +99,8 @@ router.post('/login', (async (req, res, next) => {
 
     return res.json({
       success: true,
-      magicLink: magicLink,
+      magicLinkMessage: config.beehiiv.debugMagicLinks ? 'Magic link sent successfully' : 'Magic link sent to email only',
+      magicLink: config.beehiiv.debugMagicLinks ? magicLink : 'In Email Only',
       actionCode: 'magicLinkSent',
       message: "Magic link sent successfully"
     });

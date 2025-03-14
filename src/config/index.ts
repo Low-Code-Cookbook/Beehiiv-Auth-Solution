@@ -7,10 +7,6 @@ const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT || '3001', 10),
   
-  database: {
-    url: process.env.DATABASE_URL || '',
-  },
-  
   jwt: {
     secret: process.env.JWT_SECRET || 'default-secret-change-this',
     expiresIn: process.env.JWT_EXPIRES_IN || '1d',
@@ -28,6 +24,7 @@ const config = {
   beehiiv: {
     apiKey: process.env.BEEHIIV_API_KEY || '',
     publicationId: process.env.BEEHIIV_PUBLICATION_ID || '',
+    debugMagicLinks: process.env.DEBUG_MAGIC_LINKS || false,
   },
   
   cors: {
