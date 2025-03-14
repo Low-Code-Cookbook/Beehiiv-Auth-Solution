@@ -12,12 +12,13 @@ the Low Code approach to using Beehiiv and not Firebase Auth, Auth0, Okta or any
 </a>
 
 Screenshots of the test harness app and the use case in an app.
+
 <a href="assets/ui.png" target="_blank">
-   <img src="assets/ui.png" alt="User Interface" width="300" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"/>
+   <img src="assets/ui.png" alt="User Interface" width="300"/>
 </a>
 
 <a href="assets/api-test-harness.png" target="_blank">
-   <img src="assets/api-test-harness.png" alt="API Test Harness" width="300" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"/>
+   <img src="assets/api-test-harness.png" alt="API Test Harness" width="300"/>
 </a>
 
 
