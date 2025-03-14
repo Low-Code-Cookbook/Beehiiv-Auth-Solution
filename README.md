@@ -5,14 +5,17 @@ A backend Node.js Express application that provides magic link authentication vi
 Read more about it on my [Low Code CTO - Beehiiv as an Identity Provider](https://lowcodecto/p/beehiiv-as-my-login). I explain
 the Low Code approach to using Beehiiv and not Firebase Auth, Auth0, Okta or any number of other solutions.
 
-## Screenshots
+## Technology Solution Stack
 
 <a href="assets/stack.png" target="_blank">
-   <img src="assets/stack.png" alt="Tech Stack" width="300" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"/>
+   <img src="assets/stack.png" alt="Tech Stack" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"/>
 </a>
+
+Screenshots of the test harness app and the use case in an app.
 <a href="assets/ui.png" target="_blank">
    <img src="assets/ui.png" alt="User Interface" width="300" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"/>
 </a>
+
 <a href="assets/api-test-harness.png" target="_blank">
    <img src="assets/api-test-harness.png" alt="API Test Harness" width="300" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"/>
 </a>
