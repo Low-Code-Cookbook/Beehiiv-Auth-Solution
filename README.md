@@ -7,9 +7,17 @@ the Low Code approach to using Beehiiv and not Firebase Auth, Auth0, Okta or any
 
 ## Screenshots
 
-<img src="assets/stack.png" alt="Alt text" width="500"/>
-<img src="assets/ui.png" alt="Alt text" width="500"/>
-<img src="assets/api-test-harness.png" alt="Alt text" width="500"/>
+<div style="display: flex; gap: 20px; margin-bottom: 20px;">
+    <a href="assets/stack.png" target="_blank">
+        <img src="assets/stack.png" alt="Tech Stack" width="200" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"/>
+    </a>
+    <a href="assets/ui.png" target="_blank">
+        <img src="assets/ui.png" alt="User Interface" width="200" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"/>
+    </a>
+    <a href="assets/api-test-harness.png" target="_blank">
+        <img src="assets/api-test-harness.png" alt="API Test Harness" width="200" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"/>
+    </a>
+</div>
 
 ## Business Need
 
