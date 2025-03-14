@@ -6,6 +6,7 @@ Read more about it on my [Low Code CTO - Beehiiv as an Identity Provider](https:
 the Low Code approach to using Beehiiv and not Firebase Auth, Auth0, Okta or any number of other solutions.
 
 ## Business Need
+
 I have come to believe that every part of a companies technology stack needs to be 
 aligned to revenue and to the users experience. I have a growing newsletter of Beehiiv.
 I wanted and needed a low tech way to limited access to the suite of mini apps that 
@@ -16,6 +17,19 @@ adapt and use this to drive value outside of their core content on Beehiiv.
 
 (Now, if Beehiiv was creative, this might be a good feature to add for content 
 creators.)
+
+## Security Warnings
+
+Using magic links is not the most secure way to limit access to anything. On the 
+secuirty sprectum, its not secure. But security needs to meet the need. For my needs
+this is perfect light weight solution. It is very scalable. Its very user friendly.
+and it cheap.
+
+Cheap is good!
+
+One last comment on securioty. I do not create the single-use URLs, SuperTokens
+does. This is their business.
+
 ## Features
 
 - **Magic Link Authentication**: Uses SuperTokens Passwordless for authentication
