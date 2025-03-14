@@ -7,15 +7,15 @@ the Low Code approach to using Beehiiv and not Firebase Auth, Auth0, Okta or any
 
 ## Screenshots
 
-<div style="display: flex; gap: 20px; margin-bottom: 20px;">
-    <a href="assets/stack.png" target="_blank">
-        <img src="assets/stack.png" alt="Tech Stack" width="200" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"/>
+<div style="display: flex; gap: 20px; margin-bottom: 20px; width: 100%;">
+    <a href="assets/stack.png" target="_blank" style="width: 33.33%;">
+        <img src="assets/stack.png" alt="Tech Stack" style="width: 100%; border-radius: 8px; box-shadow: 0 -2px 10px rgba(255,255,255,0.3), 0 4px 8px rgba(0,0,0,0.1);"/>
     </a>
-    <a href="assets/ui.png" target="_blank">
-        <img src="assets/ui.png" alt="User Interface" width="200" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"/>
+    <a href="assets/ui.png" target="_blank" style="width: 33.33%;">
+        <img src="assets/ui.png" alt="User Interface" style="width: 100%; border-radius: 8px; box-shadow: 0 -2px 10px rgba(255,255,255,0.3), 0 4px 8px rgba(0,0,0,0.1);"/>
     </a>
-    <a href="assets/api-test-harness.png" target="_blank">
-        <img src="assets/api-test-harness.png" alt="API Test Harness" width="200" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"/>
+    <a href="assets/api-test-harness.png" target="_blank" style="width: 33.33%;">
+        <img src="assets/api-test-harness.png" alt="API Test Harness" style="width: 100%; border-radius: 8px; box-shadow: 0 -2px 10px rgba(255,255,255,0.3), 0 4px 8px rgba(0,0,0,0.1);"/>
     </a>
 </div>
 
