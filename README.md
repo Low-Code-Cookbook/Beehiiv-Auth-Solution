@@ -163,7 +163,7 @@ Review the `.env.example` file for the values you need to define.
 - `POST /auth/login` - Use email to generate a magic link.
 - `POST /auth/callback` - Handles successful authentication with SuperTokens
 - `GET /auth/verify` - Verifies JWT token and checks subscription status
-- `POST /auth/refresh` - Refreshes expired JWT tokens
+- `POST /auth/refresh` - Refreshes expired JWT tokens (pending)
 
 ## Integration with Frontend
 
@@ -187,7 +187,7 @@ localStorage.setItem('authToken', token);
 Use the token for authenticated API requests:
 
 ```javascript
-fetch('https://your-api.com/protected-endpoint', {
+fetch('https://access.lowcodeCTO.com/auth/verify', {
   headers: {
     'Authorization': `Bearer ${localStorage.getItem('authToken')}`
   }
