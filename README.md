@@ -170,7 +170,7 @@ Review the `.env.example` file for the values you need to define.
 In your frontend application, redirect users to the SuperTokens hosted authentication page:
 
 ```javascript
-window.location.href = `${API_URL}/auth/signin?redirect_uri=${encodeURIComponent(CALLBACK_URL)}`;
+window.location.href = `https://access.lowcodeCTO.com/auth/login?redirect_uri=${encodeURIComponent(CALLBACK_URL)}`; 
 ```
 
 After successful authentication, users will be redirected back to your application with a JWT token:
