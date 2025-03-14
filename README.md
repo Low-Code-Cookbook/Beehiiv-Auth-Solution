@@ -5,6 +5,8 @@ A backend Node.js Express application that provides magic link authentication vi
 Read more about it on my [Low Code CTO - Beehiiv as an Identity Provider](https://lowcodecto/p/beehiiv-as-my-login). I explain
 the Low Code approach to using Beehiiv and not Firebase Auth, Auth0, Okta or any number of other solutions.
 
+Check out the AI integration prompts below.
+
 ## Technology Solution Stack
 
 <a href="assets/stack.png" target="_blank">
@@ -21,6 +23,40 @@ Screenshots of the test harness app and the use case in an app.
    <img src="assets/api-test-harness.png" alt="API Test Harness" width="300"/>
 </a>
 
+## AI Prompt for Adding to an Application
+Ok the final piece of the puzzle. Below are the prompts I use to tell a app to add
+a login and workflow the uses this process. I add this little auth workflow to
+a number of my applications. This set of prompts breaks the problem down and
+allows the AI coder to add in the route changes and JWT session calls where
+needed.
+
+Yes, the Ai agent does all the work.
+
+```
+First, Ok I want to add a login route that will ask the user to enter an email 
+address and will send the email to https://access.lowcodecto.com. It needs 
+to pass the https://apps.stack.lowcodeCTO.com redirect URL along with the email in the POST. 
+```
+
+```
+Second, I want you to add a route that will accept the linkCode to 
+trigger an exchange of the code for a JWT Session token using the 
+https://access.lowcodeCTO.com/auth/callback. When it returns a JWT
+token, please store the JWT token.
+```
+
+```
+Fourth, I want you update the app routes to check for the JWT
+token and send any user to the login page. On load the app should
+check for the JWT token, and call the /auth/verify that the JWT
+is still valid.
+```
+
+```
+Finally, update the login page to tell the user that to access this 
+app they need to subscribe to the Low Code CTO newsletter using the 
+url https://LowCodeCTO.com/subscribe
+```
 
 ## Business Need
 
